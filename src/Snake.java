@@ -5,24 +5,35 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public class Snake {
-    private Color color;
-    private List<List<Integer>> body;
-    private char direction = 'R';
+    private final Color color;
+    private final List<Point> body;
+
+    private int x;
+    private int y;
+
+    private char direction;
+    private int velocityX;
+    private int velocityY;
 
     public Snake(Color color) {
         this.color = color;
+
         body = new ArrayList<>();
-        List<Integer> coord = new ArrayList<>();
-        coord.add(0);
-        coord.add(0);
-        body.add(coord);
+        body.add(new Point(2, 0));
+        body.add(new Point(1, 0));
+        body.add(new Point(0, 0));
+
+        x = body.size()-1;
+        y = 0;
+
+        setDirection('R');
     }
 
     public Color getColor() {
         return color;
     }
 
-    public List<List<Integer>> getBody() {
+    public List<Point> getBody() {
         return body;
     }
 
@@ -32,43 +43,52 @@ public class Snake {
 
     public void setDirection(char direction) {
         this.direction = direction;
+
+        switch (direction) {
+            case 'R' -> {
+                velocityX = 1;
+                velocityY = 0;
+            }
+            case 'L' -> {
+                velocityX = -1;
+                velocityY = 0;
+            }
+            case 'D' -> {
+                velocityX = 0;
+                velocityY = 1;
+            }
+            case 'U' -> {
+                velocityX = 0;
+                velocityY = -1;
+            }
+        }
     }
 
     public boolean isDead() {
-        Set<List<Integer>> set = new HashSet<>();
-        for (List<Integer> coord : body)
+        Set<Point> set = new HashSet<>();
+        for (Point coord : body)
             set.add(coord);
         return set.size() != body.size();
     }
 
     public void grow() {
-        List<Integer> oldHead = body.get(0);
-        advanceHead();
-        body.add(1, oldHead);
+        body.add(body.get(0));
     }
 
     public void advance() {
-        List<List<Integer>> oldBody = new ArrayList<>(body);
-        advanceHead();
-        for (int i = 1; i < body.size(); i++)
-            body.set(i, oldBody.get(i-1));
-    }
+        List<Point> oldBody = new ArrayList<>(body);
 
-    private void advanceHead() {
-        switch (direction) {
-            case 'R':
-                body.get(0).set(0, (body.get(0).get(0)+1) % Game.playgroundWidth);
-                break;
-            case 'L':
-                body.get(0).set(0, (body.get(0).get(0)-1) % Game.playgroundWidth);
-                break;
-            case 'D':
-                body.get(0).set(1, (body.get(0).get(1)+1) % Game.playgroundHeight);
-            case 'U':
-                body.get(0).set(1, (body.get(0).get(1)-1) % Game.playgroundHeight);
-                break;
-            default:
-                break;
-        }
+        // advance body
+        for (int i = 1; i < body.size()-1; i++)
+            body.set(i, oldBody.get(i-1));
+
+        // advance tail
+        if (body.size() > 1)
+            body.set(body.size()-1, oldBody.get(body.size()-2));
+
+        // advance head
+        x = Math.floorMod(x+velocityX, Game.playgroundWidth);
+        y = Math.floorMod(y+velocityY, Game.playgroundHeight);
+        body.set(0, new Point(x, y));
     }
 }

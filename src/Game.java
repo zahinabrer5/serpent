@@ -1,8 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 
-public class Game extends JPanel {
+public class Game extends JPanel implements ActionListener {
     public static final int width = 1000;
     public static final int height = 600;
 
@@ -10,8 +12,11 @@ public class Game extends JPanel {
     public static final int playgroundWidth = width/cellSize;
     public static final int playgroundHeight = height/cellSize;
 
-    private Snake bobby;
-    private Food food;
+    private final Snake bobby;
+    private final Food food;
+
+    private final int fps = 7;
+    private final Timer timer;
 
     public Game() {
         this.setPreferredSize(new Dimension(width, height));
@@ -22,6 +27,9 @@ public class Game extends JPanel {
 
         bobby = new Snake(Color.GREEN);
         food = new Food(Color.RED);
+
+        timer = new Timer(1000/fps, this);
+        timer.start();
     }
 
     @Override
@@ -59,12 +67,18 @@ public class Game extends JPanel {
     private void drawSnake(Graphics2D g2) {
         g2.setColor(bobby.getColor());
 
-        List<List<Integer>> body = bobby.getBody();
-        for (List<Integer> coord : body) {
-            int x = coord.get(0);
-            int y = coord.get(1);
+        List<Point> body = bobby.getBody();
+        for (Point coord : body) {
+            int x = coord.x;
+            int y = coord.y;
 
             g2.fillRect(x*cellSize, y*cellSize, cellSize, cellSize);
         }
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        bobby.advance();
+        repaint();
     }
 }
