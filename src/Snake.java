@@ -78,17 +78,17 @@ public class Snake {
     public void advance() {
         List<Point> oldBody = new ArrayList<>(body);
 
-        // advance body
-        for (int i = 1; i < body.size()-1; i++)
-            body.set(i, oldBody.get(i-1));
-
-        // advance tail
-        if (body.size() > 1)
-            body.set(body.size()-1, oldBody.get(body.size()-2));
-
         // advance head
         x = Math.floorMod(x+velocityX, Game.playgroundWidth);
         y = Math.floorMod(y+velocityY, Game.playgroundHeight);
         body.set(0, new Point(x, y));
+
+        // advance body
+        for (int i = 1; i < body.size(); i++)
+            body.set(i, oldBody.get(i-1));
+
+        // advance tail
+//        if (body.size() > 1)
+//            body.set(body.size()-1, oldBody.get(body.size()-2));
     }
 }

@@ -4,13 +4,17 @@ import java.util.Random;
 
 public class Food {
     private Color color;
-    private int x = 1;
-    private int y = 0;
+    private int x;
+    private int y;
     private static Random rand;
 
     public Food(Color color) {
         this.color = color;
         rand = new Random();
+
+        x = 1;
+        y = 0;
+
         spawn();
     }
 
