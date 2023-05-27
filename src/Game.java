@@ -15,7 +15,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     public static final int playgroundHeight = height/cellSize;
 
     private final Snake bobby;
-    private final Food food;
+    private final Food apple;
 
     private final int fps = 13;
     private final Timer timer;
@@ -31,7 +31,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         this.addKeyListener(this);
 
         bobby = new Snake(Color.GREEN);
-        food = new Food(Color.RED);
+        apple = new Food(Color.RED, bobby);
 
         keyboardBuffer = new StringBuilder("R");
 
@@ -68,8 +68,8 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     }
 
     private void drawFood(Graphics2D g2) {
-        g2.setColor(food.getColor());
-        g2.fillRect(food.getX()*cellSize, food.getY()*cellSize, cellSize, cellSize);
+        g2.setColor(apple.getColor());
+        g2.fillRect(apple.x*cellSize, apple.y*cellSize, cellSize, cellSize);
     }
 
     private void drawSnake(Graphics2D g2) {
@@ -91,7 +91,14 @@ public class Game extends JPanel implements ActionListener, KeyListener {
             keyboardBuffer.deleteCharAt(0);
         }
 
+        if (apple.eaten()) {
+            bobby.grow();
+            apple.respawn();
+        }
         bobby.advance();
+        if (bobby.isDead())
+            timer.stop();
+
         repaint();
     }
 

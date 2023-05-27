@@ -1,8 +1,6 @@
 import java.awt.*;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
 
 public class Snake {
     private final Color color;
@@ -65,10 +63,10 @@ public class Snake {
     }
 
     public boolean isDead() {
-        Set<Point> set = new HashSet<>();
-        for (Point coord : body)
-            set.add(coord);
-        return set.size() != body.size();
+        for (int i = 1; i < body.size(); i++)
+            if (body.get(i).equals(body.get(0)))
+                return true;
+        return false;
     }
 
     public void grow() {
@@ -86,9 +84,5 @@ public class Snake {
         // advance body
         for (int i = 1; i < body.size(); i++)
             body.set(i, oldBody.get(i-1));
-
-        // advance tail
-//        if (body.size() > 1)
-//            body.set(body.size()-1, oldBody.get(body.size()-2));
     }
 }

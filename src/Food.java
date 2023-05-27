@@ -2,49 +2,38 @@ import java.awt.*;
 import java.util.List;
 import java.util.Random;
 
-public class Food {
-    private Color color;
-    private int x;
-    private int y;
-    private static Random rand;
+public class Food extends Point {
+    private final Color color;
+    private final List<Point> snakeBody;
+    private final Random rand;
 
-    public Food(Color color) {
+    public Food(Color color, Snake snake) {
         this.color = color;
+        this.snakeBody = snake.getBody();
         rand = new Random();
 
-        x = 1;
-        y = 0;
-
-        spawn();
+        respawn();
     }
 
     public Color getColor() {
         return color;
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    private void spawn() {
-        x = rand.nextInt(Game.playgroundWidth);
-        y = rand.nextInt(Game.playgroundHeight);
-    }
-
-    public void respawn(List<List<Integer>> body) {
+    public void respawn() {
         do {
-            spawn();
-        } while (snakeBodyContains(body));
+            x = rand.nextInt(Game.playgroundWidth);
+            y = rand.nextInt(Game.playgroundHeight);
+        } while (snakeBodyContains());
     }
 
-    private boolean snakeBodyContains(List<List<Integer>> body) {
-        for (List<Integer> coord : body)
-            if (coord.get(0) == x && coord.get(1) == y)
+    private boolean snakeBodyContains() {
+        for (Point coord : snakeBody)
+            if (coord.x == x && coord.y == y)
                 return true;
         return false;
+    }
+
+    public boolean eaten() {
+        return this.equals(snakeBody.get(0));
     }
 }
