@@ -1,15 +1,14 @@
 import java.awt.*;
-import java.util.List;
 import java.util.Random;
 
 public class Food extends Point {
     private final Color color;
-    private final List<Point> snakeBody;
+    private Snake[] snakes;
     private final Random rand;
 
-    public Food(Color color, Snake snake) {
+    public Food(Color color, Snake... snakes) {
         this.color = color;
-        this.snakeBody = snake.getBody();
+        this.snakes = snakes;
         rand = new Random();
 
         respawn();
@@ -17,6 +16,10 @@ public class Food extends Point {
 
     public Color getColor() {
         return color;
+    }
+
+    public void setSnakes(Snake... snakes) {
+        this.snakes = snakes;
     }
 
     public void respawn() {
@@ -27,13 +30,10 @@ public class Food extends Point {
     }
 
     private boolean snakeBodyContains() {
-        for (Point coord : snakeBody)
-            if (coord.x == x && coord.y == y)
-                return true;
+        for (Snake snake : snakes)
+            for (Point coord : snake.getBody())
+                if (coord.x == x && coord.y == y)
+                    return true;
         return false;
-    }
-
-    public boolean eaten() {
-        return this.equals(snakeBody.get(0));
     }
 }

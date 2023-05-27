@@ -13,8 +13,15 @@ public class Snake {
     private int velocityX;
     private int velocityY;
 
-    public Snake(Color color) {
+    private int highScore = 0;
+
+    private StringBuilder keyboardBuffer;
+
+    private String name;
+
+    public Snake(Color color, String name) {
         this.color = color;
+        this.name = name;
 
         body = new ArrayList<>();
         body.add(new Point(0, 0));
@@ -23,6 +30,8 @@ public class Snake {
         y = 0;
 
         setDirection('R');
+
+        resetKeyboardBuffer();
     }
 
     public Color getColor() {
@@ -35,6 +44,18 @@ public class Snake {
 
     public char getDirection() {
         return direction;
+    }
+
+    public int getScore() {
+        return body.size()-1;
+    }
+
+    public int getHighScore() {
+        return highScore;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void setDirection(char direction) {
@@ -60,6 +81,17 @@ public class Snake {
         }
     }
 
+    public int setHighScore() {
+        int oldHighScore = highScore;
+        if (getScore() > highScore)
+            highScore = getScore();
+        return oldHighScore;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public boolean isDead() {
         for (int i = 1; i < body.size(); i++)
             if (body.get(i).equals(body.get(0)))
@@ -82,5 +114,32 @@ public class Snake {
         // advance body
         for (int i = 1; i < body.size(); i++)
             body.set(i, oldBody.get(i-1));
+    }
+
+    public void updateKeyboardBuffer() {
+        if (this.keyboardBuffer.length() > 0) {
+            this.setDirection(this.keyboardBuffer.charAt(0));
+            this.keyboardBuffer.deleteCharAt(0);
+        }
+    }
+
+    public void resetKeyboardBuffer() {
+        if (keyboardBuffer == null)
+            keyboardBuffer = new StringBuilder();
+        else
+            this.keyboardBuffer.setLength(0);
+        this.keyboardBuffer.append('R');
+    }
+
+    public void appendToKeyboardBuffer(char c) {
+        this.keyboardBuffer.append(c);
+    }
+
+    public boolean eaten(Food food) {
+        if (food.equals(body.get(0))) {
+            grow();
+            return true;
+        }
+        return false;
     }
 }

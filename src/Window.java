@@ -10,7 +10,7 @@ public class Window extends JFrame {
         JPanel panels = new JPanel();
         panels.setLayout(new BorderLayout());
 
-        Game game = new Game();
+        Game game = new Game(true);
         panels.add(game, BorderLayout.PAGE_END);
 
         this.add(panels);

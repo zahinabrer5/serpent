@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.sql.SQLOutput;
 import java.util.List;
 
 public class Game extends JPanel implements ActionListener, KeyListener {
@@ -15,16 +16,15 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     public static final int playgroundHeight = height/cellSize;
 
     private Snake bobby;
+    private Snake dobby;
     private Food apple;
 
     private final int fps = 13;
     private final Timer timer;
 
-    private final StringBuilder keyboardBuffer;
+    private final boolean multiplayer;
 
-    private int highScore = 0;
-
-    public Game() {
+    public Game(boolean multiplayer) {
         this.setPreferredSize(new Dimension(width, height));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
@@ -32,10 +32,14 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         this.requestFocus();
         this.addKeyListener(this);
 
-        bobby = new Snake(Color.GREEN);
+        bobby = new Snake(Color.GREEN, "Bobby");
         apple = new Food(Color.RED, bobby);
 
-        keyboardBuffer = new StringBuilder("R");
+        this.multiplayer = multiplayer;
+        if (multiplayer) {
+            dobby = new Snake(Color.BLUE, "Dobby");
+            apple.setSnakes(bobby, dobby);
+        }
 
         timer = new Timer(1000/fps, this);
         timer.start();
@@ -53,7 +57,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 
         drawPlayground(g2);
         drawFood(g2);
-        drawSnake(g2);
+        drawAllSnakes(g2);
     }
 
     private void drawPlayground(Graphics2D g2) {
@@ -74,10 +78,17 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         g2.fillRect(apple.x*cellSize, apple.y*cellSize, cellSize, cellSize);
     }
 
-    private void drawSnake(Graphics2D g2) {
-        g2.setColor(bobby.getColor());
+    private void drawAllSnakes(Graphics2D g2) {
+        drawSnake(g2, bobby);
 
-        List<Point> body = bobby.getBody();
+        if (multiplayer)
+            drawSnake(g2, dobby);
+    }
+
+    private void drawSnake(Graphics2D g2, Snake snake) {
+        g2.setColor(snake.getColor());
+
+        List<Point> body = snake.getBody();
         for (Point coord : body) {
             int x = coord.x;
             int y = coord.y;
@@ -88,25 +99,48 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (keyboardBuffer.length() > 0) {
-            bobby.setDirection(keyboardBuffer.charAt(0));
-            keyboardBuffer.deleteCharAt(0);
+        if (playgroundFilled()) {
+            System.out.println("Playground got filled somehow!!!");
+            System.exit(0);
         }
 
-        if (apple.eaten()) {
-            bobby.grow();
-            apple.respawn();
-        }
-        bobby.advance();
-        if (bobby.isDead()) {
-            timer.stop();
-            int score = bobby.getBody().size();
-            if (score > highScore)
-                highScore = score;
-            new PlayAgainWindow(this, score, highScore);
-        }
+        eatingActions();
+
+        gameActions(bobby);
+
+        if (multiplayer)
+            gameActions(dobby);
 
         repaint();
+    }
+
+    private void eatingActions() {
+        boolean bobbyEaten = bobby.eaten(apple);
+        boolean dobbyEaten = multiplayer && dobby.eaten(apple);
+        if (bobbyEaten || dobbyEaten)
+            apple.respawn();
+    }
+
+    private boolean playgroundFilled() {
+        for (int i = 0; i < playgroundHeight; i++) {
+            for (int j = 0; j < playgroundWidth; j++) {
+                Point coord = new Point(j, i);
+                if (!bobby.getBody().contains(coord))
+                    return false;
+                if (multiplayer && !dobby.getBody().contains(coord))
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    private void gameActions(Snake snake) {
+        snake.updateKeyboardBuffer();
+        snake.advance();
+        if (snake.isDead()) {
+            timer.stop();
+            new PlayAgainWindow(this, this.bobby, this.dobby);
+        }
     }
 
     @Override
@@ -118,21 +152,41 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         switch (key) {
-            case KeyEvent.VK_RIGHT, KeyEvent.VK_D -> {
+            case KeyEvent.VK_RIGHT -> {
                 if (bobby.getDirection() != 'L')
-                    keyboardBuffer.append('R');
+                    bobby.appendToKeyboardBuffer('R');
             }
-            case KeyEvent.VK_LEFT, KeyEvent.VK_A -> {
+            case KeyEvent.VK_LEFT -> {
                 if (bobby.getDirection() != 'R')
-                    keyboardBuffer.append('L');
+                    bobby.appendToKeyboardBuffer('L');
             }
-            case KeyEvent.VK_DOWN, KeyEvent.VK_S -> {
+            case KeyEvent.VK_DOWN -> {
                 if (bobby.getDirection() != 'U')
-                    keyboardBuffer.append('D');
+                    bobby.appendToKeyboardBuffer('D');
             }
-            case KeyEvent.VK_UP, KeyEvent.VK_W -> {
+            case KeyEvent.VK_UP -> {
                 if (bobby.getDirection() != 'D')
-                    keyboardBuffer.append('U');
+                    bobby.appendToKeyboardBuffer('U');
+            }
+        }
+        if (multiplayer) {
+            switch (key) {
+                case KeyEvent.VK_D -> {
+                    if (dobby.getDirection() != 'L')
+                        dobby.appendToKeyboardBuffer('R');
+                }
+                case KeyEvent.VK_A -> {
+                    if (dobby.getDirection() != 'R')
+                        dobby.appendToKeyboardBuffer('L');
+                }
+                case KeyEvent.VK_S -> {
+                    if (dobby.getDirection() != 'U')
+                        dobby.appendToKeyboardBuffer('D');
+                }
+                case KeyEvent.VK_W -> {
+                    if (dobby.getDirection() != 'D')
+                        dobby.appendToKeyboardBuffer('U');
+                }
             }
         }
     }
@@ -143,11 +197,13 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     }
 
     public void reset() {
-        bobby = new Snake(Color.GREEN);
+        bobby = new Snake(Color.GREEN, "Bobby");
         apple = new Food(Color.RED, bobby);
 
-        keyboardBuffer.setLength(0);
-        keyboardBuffer.append('R');
+        if (multiplayer) {
+            dobby = new Snake(Color.BLUE, "Dobby");
+            apple.setSnakes(bobby, dobby);
+        }
 
         timer.start();
     }
