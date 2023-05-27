@@ -14,13 +14,15 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     public static final int playgroundWidth = width/cellSize;
     public static final int playgroundHeight = height/cellSize;
 
-    private final Snake bobby;
-    private final Food apple;
+    private Snake bobby;
+    private Food apple;
 
     private final int fps = 13;
     private final Timer timer;
 
     private final StringBuilder keyboardBuffer;
+
+    private int highScore = 0;
 
     public Game() {
         this.setPreferredSize(new Dimension(width, height));
@@ -96,8 +98,13 @@ public class Game extends JPanel implements ActionListener, KeyListener {
             apple.respawn();
         }
         bobby.advance();
-        if (bobby.isDead())
+        if (bobby.isDead()) {
             timer.stop();
+            int score = bobby.getBody().size();
+            if (score > highScore)
+                highScore = score;
+            new PlayAgainWindow(this, score, highScore);
+        }
 
         repaint();
     }
@@ -133,5 +140,15 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
 
+    }
+
+    public void reset() {
+        bobby = new Snake(Color.GREEN);
+        apple = new Food(Color.RED, bobby);
+
+        keyboardBuffer.setLength(0);
+        keyboardBuffer.append('R');
+
+        timer.start();
     }
 }

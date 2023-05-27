@@ -17,11 +17,9 @@ public class Snake {
         this.color = color;
 
         body = new ArrayList<>();
-        body.add(new Point(2, 0));
-        body.add(new Point(1, 0));
         body.add(new Point(0, 0));
 
-        x = body.size()-1;
+        x = 0;
         y = 0;
 
         setDirection('R');
