@@ -4,6 +4,10 @@ import java.util.ArrayList;
 
 public class Snake {
     private final Color color;
+    // use a list of points instead of a list of lists
+    // at first I used a list of lists, which produced some weird
+    // errors in snake movement due to list references being copied
+    // instead of their actual values being copied into new lists
     private final List<Point> body;
 
     private int x;
@@ -15,6 +19,10 @@ public class Snake {
 
     private int highScore = 0;
 
+    // a keyboard buffer is used to ensure the snake doesn't show
+    // weird behaviour when the user presses different keys in rapid
+    // succession
+    // this acts like a queue
     private StringBuilder keyboardBuffer;
 
     private String name;
@@ -58,6 +66,9 @@ public class Snake {
         return name;
     }
 
+    // basically sets the directions for the x and y components
+    // velocity is a vector quantity, so it also needs a direction
+    // (denoted by positive or negative here)
     public void setDirection(char direction) {
         this.direction = direction;
 
@@ -81,6 +92,9 @@ public class Snake {
         }
     }
 
+    // set the new high score, returns the old high score
+    // to make it easier to check if the snake has beaten
+    // its old high score
     public int setHighScore() {
         int oldHighScore = highScore;
         if (getScore() > highScore)
@@ -92,6 +106,9 @@ public class Snake {
         this.name = name;
     }
 
+    // the snake is dead if the head is found in the snake
+    // outside the position the head should be in (the head
+    // is in position 0 of the list representing the body)
     public boolean isDead() {
         for (int i = 1; i < body.size(); i++)
             if (body.get(i).equals(body.get(0)))
@@ -99,23 +116,42 @@ public class Snake {
         return false;
     }
 
+    // add the head to the body again to grow the snake
     public void grow() {
         body.add(body.get(0));
+        // print the body every growth for debugging
+        System.out.println(name+" has grown: "+bodyFormattedString());
+    }
+
+    // return a nice formatted string for body
+    public String bodyFormattedString() {
+        StringBuilder sb = new StringBuilder("[");
+        for (Point coord : body) {
+            sb.append("(").append(coord.x).append(", ").append(coord.y).append("), ");
+        }
+        sb.deleteCharAt(sb.length()-1);
+        sb.deleteCharAt(sb.length()-1);
+        sb.append("]");
+        return sb.toString();
     }
 
     public void advance() {
         List<Point> oldBody = new ArrayList<>(body);
 
         // advance head
+        // use floor mod to allow snake to pass through playground borders
+        // floor mod is different from % because it takes into account of
+        // negative values
         x = Math.floorMod(x+velocityX, Game.playgroundWidth);
         y = Math.floorMod(y+velocityY, Game.playgroundHeight);
         body.set(0, new Point(x, y));
 
-        // advance body
+        // advance body by shifting body array
         for (int i = 1; i < body.size(); i++)
             body.set(i, oldBody.get(i-1));
     }
 
+    // use the next keyboard input and pop it off the buffer
     public void updateKeyboardBuffer() {
         if (this.keyboardBuffer.length() > 0) {
             this.setDirection(this.keyboardBuffer.charAt(0));
@@ -135,6 +171,9 @@ public class Snake {
         this.keyboardBuffer.append(c);
     }
 
+    // grow the snake if the food has the same coordinates as
+    // the snake's head, return the boolean representing whether
+    // the snake grew or not
     public boolean eaten(Food food) {
         if (food.equals(body.get(0))) {
             grow();

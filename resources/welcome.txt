@@ -1,0 +1,31 @@
+                   /^\/^\
+                 _|__|  O|
+        \/     /~     \_/ \
+         \____|__________/  \
+                \_______      \
+                        `\     \                 \
+                          |     |                  \
+                         /      /                    \
+                        /     /                       \\
+                      /      /                         \ \
+                     /     /                            \  \
+                   /     /             _----_            \   \
+                  /     /           _-~      ~-_         |   |
+                 (      (        _-~    _--_    ~-_     _/   |
+                  \      ~-____-~    _-~    ~-_    ~-_-~    /
+                    ~-_           _-~          ~-_       _-~
+                       ~--______-~                ~-___-~
+                  _____                            __
+                 / ___/___  _________  ___  ____  / /_
+                 \__ \/ _ \/ ___/ __ \/ _ \/ __ \/ __/
+                ___/ /  __/ /  / /_/ /  __/ / / / /_
+               /____/\___/_/  / .___/\___/_/ /_/\__/
+                             /_/
+======================================================================
+Move your green snake around with arrow keys and grow it by eating
+apples! You die when you bump into yourself!
+
+If you select multiplayer mode, there are will be two snakes! The new
+snake is blue and will be controlled by WASD keys, so you can get a
+friend to play with you. Whichever snake bumps into themselves first
+loses!

@@ -18,12 +18,15 @@ public class PlayAgainWindow extends JFrame implements ActionListener {
 
         this.game = game;
 
+        // use list because there could be multiple snakes
+        // after "GAME OVER!!" there will be a message for each snake
         List<StringBuilder> msgs = new ArrayList<>();
         msgs.add(new StringBuilder("GAME OVER!!"));
         for (Snake snake : snakes) {
             String name = snake.getName();
             int score = snake.getScore();
 
+            // build the messages that shows up on the play again window
             StringBuilder msg = new StringBuilder();
             if (snake.isDead())
                 msg.append(name).append("'s dead! ");
@@ -51,6 +54,7 @@ public class PlayAgainWindow extends JFrame implements ActionListener {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         for (StringBuilder msg : msgs) {
+            // create different JLabels for each message
             JLabel label = new JLabel(msg.toString());
             mainPanel.add(label, gbc);
         }
@@ -62,7 +66,7 @@ public class PlayAgainWindow extends JFrame implements ActionListener {
         this.pack();
 
         this.setLocationRelativeTo(null);
-//        this.setIconImage(new ImageIcon(getClass().getResource("logo.png")).getImage());
+        this.setIconImage(new ImageIcon(getClass().getResource("logo.png")).getImage());
         this.setVisible(true);
     }
 

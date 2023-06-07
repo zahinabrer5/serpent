@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.sql.SQLOutput;
 import java.util.List;
 
 public class Game extends JPanel implements ActionListener, KeyListener {
@@ -12,6 +11,8 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     public static final int height = 600;
 
     public static final int cellSize = 25;
+    // width and height of the playing window in terms of cellSize
+    // useful for looping through the playground like in playgroundFilled()
     public static final int playgroundWidth = width/cellSize;
     public static final int playgroundHeight = height/cellSize;
 
@@ -24,23 +25,29 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 
     private final boolean multiplayer;
 
-    public Game(boolean multiplayer) {
+    public Game(Object[] data) {
+        // unpack data array into variables
+        boolean multiplayer = (boolean)data[0];
+        String snake1Name = (String)data[1];
+        String snake2Name = (String)data[2];
+
         this.setPreferredSize(new Dimension(width, height));
         this.setBackground(Color.BLACK);
-        this.setDoubleBuffered(true);
+        this.setDoubleBuffered(true); // used for reduced lag on animation
         this.setFocusable(true);
         this.requestFocus();
         this.addKeyListener(this);
 
-        bobby = new Snake(Color.GREEN, "Bobby");
+        bobby = new Snake(Color.GREEN, snake1Name);
         apple = new Food(Color.RED, bobby);
 
         this.multiplayer = multiplayer;
         if (multiplayer) {
-            dobby = new Snake(Color.BLUE, "Dobby");
+            dobby = new Snake(Color.BLUE, snake2Name);
             apple.setSnakes(bobby, dobby);
         }
 
+        // make a timer that calls actionPerfomed every fps times in a second
         timer = new Timer(1000/fps, this);
         timer.start();
     }
@@ -60,6 +67,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         drawAllSnakes(g2);
     }
 
+    // draw grid lines for playground
     private void drawPlayground(Graphics2D g2) {
         g2.setColor(new Color(0x171717));
         g2.setStroke(new BasicStroke(1));
@@ -99,6 +107,10 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        // add this check because during testing I noticed the game
+        // just hangs when the playground gets completely filled by a snake
+        // I couldn't find a simple way to stop the game, so I added an instant
+        // kill method
         if (playgroundFilled()) {
             System.out.println("Playground got filled somehow!!!");
             System.exit(0);
@@ -114,6 +126,8 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         repaint();
     }
 
+    // handle actions related to when a snake eats the food or not
+    // the food should respawn when either snake eats it
     private void eatingActions() {
         boolean bobbyEaten = bobby.eaten(apple);
         boolean dobbyEaten = multiplayer && dobby.eaten(apple);
@@ -169,6 +183,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
                     bobby.appendToKeyboardBuffer('U');
             }
         }
+        // use WASD keys for snake 2
         if (multiplayer) {
             switch (key) {
                 case KeyEvent.VK_D -> {
