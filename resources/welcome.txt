@@ -25,7 +25,7 @@
 Move your green snake around with arrow keys and grow it by eating
 apples! You die when you bump into yourself!
 
-If you select multiplayer mode, there are will be two snakes! The new
+If you select multiplayer mode, there will be two snakes! The new
 snake is blue and will be controlled by WASD keys, so you can get a
 friend to play with you. Whichever snake bumps into themselves first
 loses!

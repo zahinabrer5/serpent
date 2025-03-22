@@ -1,5 +1,5 @@
 import javax.swing.*;
-import java.awt.*;
+import java.util.Objects;
 
 public class Window extends JFrame {
     public Window(Object[] data) {
@@ -13,7 +13,7 @@ public class Window extends JFrame {
         this.pack();
 
         this.setLocationRelativeTo(null);
-        this.setIconImage(new ImageIcon(getClass().getResource("logo.png")).getImage());
+        this.setIconImage(new ImageIcon(Objects.requireNonNull(getClass().getResource("logo.png"))).getImage());
         this.setVisible(true);
     }
 }

@@ -153,7 +153,10 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         snake.advance();
         if (snake.isDead()) {
             timer.stop();
-            new PlayAgainWindow(this, this.bobby, this.dobby);
+            if (multiplayer)
+                new PlayAgainWindow(this, this.bobby, this.dobby);
+            else
+                new PlayAgainWindow(this, this.bobby);
         }
     }
 
@@ -212,11 +215,11 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     }
 
     public void reset() {
-        bobby = new Snake(Color.GREEN, "Bobby");
+        bobby = new Snake(Color.GREEN, bobby.getName());
         apple = new Food(Color.RED, bobby);
 
         if (multiplayer) {
-            dobby = new Snake(Color.BLUE, "Dobby");
+            dobby = new Snake(Color.BLUE, dobby.getName());
             apple.setSnakes(bobby, dobby);
         }
 

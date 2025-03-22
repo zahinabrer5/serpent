@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class PlayAgainWindow extends JFrame implements ActionListener {
     private final JButton playAgainBtn;
@@ -66,7 +67,7 @@ public class PlayAgainWindow extends JFrame implements ActionListener {
         this.pack();
 
         this.setLocationRelativeTo(null);
-        this.setIconImage(new ImageIcon(getClass().getResource("logo.png")).getImage());
+        this.setIconImage(new ImageIcon(Objects.requireNonNull(getClass().getResource("logo.png"))).getImage());
         this.setVisible(true);
     }
 

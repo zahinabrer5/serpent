@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.io.*;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Main {
@@ -13,7 +14,7 @@ public class Main {
 
         Scanner sc = new Scanner(System.in);
         System.out.print("\nPlay multiplayer mode (Y or y for yes, anything else for no): ");
-        boolean multiplayer = sc.nextLine().equalsIgnoreCase("y");
+        Boolean multiplayer = (Boolean) sc.nextLine().equalsIgnoreCase("y");
 
         System.out.print("\nEnter snake 1 name: ");
         String snake1Name = sc.nextLine();
@@ -39,7 +40,7 @@ public class Main {
     // https://stackoverflow.com/questions/5868369/how-can-i-read-a-large-text-file-line-by-line-using-java
     private static void printWelcomeMessage() {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(
-                Main.class.getResourceAsStream("welcome.txt")))) {
+                Objects.requireNonNull(Main.class.getResourceAsStream("welcome.txt"))))) {
             for (String line; (line = br.readLine()) != null; ) {
                 System.out.println(line);
             }

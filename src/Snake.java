@@ -111,20 +111,20 @@ public class Snake {
     // is in position 0 of the list representing the body)
     public boolean isDead() {
         for (int i = 1; i < body.size(); i++)
-            if (body.get(i).equals(body.get(0)))
+            if (body.get(i).equals(body.getFirst()))
                 return true;
         return false;
     }
 
     // add the head to the body again to grow the snake
     public void grow() {
-        body.add(body.get(0));
+        body.add(body.getFirst());
         // print the body every growth for debugging
-        System.out.println(name+" has grown: "+bodyFormattedString());
+//        System.out.println(this);
     }
 
     // return a nice formatted string for body
-    public String bodyFormattedString() {
+    public String toString() {
         StringBuilder sb = new StringBuilder("[");
         for (Point coord : body) {
             sb.append("(").append(coord.x).append(", ").append(coord.y).append("), ");
@@ -132,6 +132,7 @@ public class Snake {
         sb.deleteCharAt(sb.length()-1);
         sb.deleteCharAt(sb.length()-1);
         sb.append("]");
+        sb.insert(0, name+": ");
         return sb.toString();
     }
 
@@ -153,7 +154,7 @@ public class Snake {
 
     // use the next keyboard input and pop it off the buffer
     public void updateKeyboardBuffer() {
-        if (this.keyboardBuffer.length() > 0) {
+        if (!this.keyboardBuffer.isEmpty()) {
             this.setDirection(this.keyboardBuffer.charAt(0));
             this.keyboardBuffer.deleteCharAt(0);
         }
@@ -175,7 +176,7 @@ public class Snake {
     // the snake's head, return the boolean representing whether
     // the snake grew or not
     public boolean eaten(Food food) {
-        if (food.equals(body.get(0))) {
+        if (food.equals(body.getFirst())) {
             grow();
             return true;
         }
